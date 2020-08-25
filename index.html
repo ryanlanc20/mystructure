@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MyStructure</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="container-fluid border-bottom bg-dark text-light">
+            <h1 class="text-center">MyStructure</h1>
+        </div>
+        <br/>
+        <div class="container-md">
+            <div class="alert alert-info">
+                <h2>Welcome to MyStructure : An app created using JQuery and Bootstrap</h2>
+                <p>This app aims to do the following:</p>
+                <ul>
+                    <li>
+                        Allow users to create daily todo lists
+                    </li>
+                    <li>
+                        Allow automated replication of recurring tasks
+                    </li>
+                    <li>
+                        Allow users to monitor progress
+                    </li>
+                    <li>
+                        Allow users to set deadlines for tasks
+                    </li>
+                </ul>
+                Note: This app currently uses local storage.
+                Backend will be developed shortly.
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-muted">Update, create or view calander event</h3>
+                </div>
+                <div class="card-body">
+                        <div class="alert alert-success alert-dismissible fade show" id="formAlert" role="alert">
+                            <p></p>
+                            <button type="button" id="formAlertClose" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">Select date</span>
+                            </div>
+                            <input type="date" class="form-control" id="dateSelector" aria-describedby="selectDate">
+                        </div>
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">Task description</span>
+                            </div>
+                            <input type="text" class="form-control" id="taskDesc" aria-describedby="taskName">
+                            <button  class="input-group-append btn btn-primary" id="taskAdd" aria-describedby="addTask">
+                                Add
+                            </button>
+                        </div>
+                        <br/>
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Quick add</span>
+                            </div>
+                           <div class="container-fluid bg-light form-control" id="quickAddBox" style="height:auto;">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="text-center">
+                            <h3 id="completionPercentage"></h3>
+                            <div class="progress">
+                                <div class="progress-bar" id="progressbar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <br/>
+                        <ul class="list-group" id="taskList">
+
+                        </ul>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <br/>
+        <h5 class="text-center">Copyright &copy; Ryan Noonan 2020</h5>
+    </div>
+    <br/>
+    <br/>
+    <script>
+
+        //Datastore
+        var data = window.localStorage.getItem("mystructure-data");
+        var eventData =  JSON.parse(data) || {};
+        var taskset = JSON.parse(window.localStorage.getItem("taskset"));
+        var taskCount = 0;
+
+        if(taskset === null)
+        {
+            window.localStorage.setItem("taskset","{}");
+            taskset = {};
+        }
+
+
+        //UI components
+        var dateSelector = $("#dateSelector");
+        var taskDescription = $("#taskDesc");
+        var taskSubmit = $("#taskAdd");
+        var taskList = $("#taskList");
+        var percentCompleteLbl = $("#completionPercentage");
+        var progressbar = $("#progressbar");
+        var formAlertBox = $("#formAlert");
+        var formAlertTxt = $("#formAlert p").first();
+        var formAlertCloseBtn = $("#formAlertClose");
+        var confirmationDialog = $("#confirmationModal");
+        var quickAddBox = $("#quickAddBox");
+
+
+        function updateStorage()
+        {
+             window.localStorage.setItem("mystructure-data",JSON.stringify(eventData));
+             window.localStorage.setItem("taskset",JSON.stringify(taskset));
+        }
+
+
+        function addTask(date,taskDesc,isRescheduled)
+        {
+            //Init object for date if not exists
+            if(date in eventData === false)
+                eventData[date] = {"tasks":{},"completed":0,"count":0};
+
+            //Insert task for specified date
+            var taskId = date + "_" + "task_" + taskCount++;
+
+            //Put task into task set
+            if(!isRescheduled)
+            {
+                if(taskDesc in taskset)
+                    taskset[taskDesc]++;
+                else
+                    taskset[taskDesc] = 1;
+            }
+
+            var taskDescIndex = Object.keys(taskset).indexOf(taskDesc);
+            eventData[date]["tasks"][taskId] = {"id":taskId,"complete":false,"descid":taskDescIndex};
+            eventData[date]["count"]++;
+            updateStorage();
+        }
+
+
+        function deleteTask(date,task,isRescheduled)
+        {
+            if(date in eventData && task.id in eventData[date]["tasks"])
+            {
+                //Update task frequencies and delete if frequency is zero
+                let taskKey = Object.keys(taskset)[task.descid];
+                if(!isRescheduled && --taskset[taskKey] == 0)
+                {
+                    //delete taskset[taskKey];
+                    $("#quickadd_"+taskKey).remove();
+                }
+
+                //Only decrement global completion count if task marked as completed
+                if(task.complete)
+                    eventData[date]["completed"]--;
+
+                eventData[date]["count"]--;
+                delete eventData[date]["tasks"][task.id];
+            }
+        }
+
+
+        function rescheduleTask(oldDate,newDate,task,taskDesc)
+        {
+            deleteTask(oldDate,task,true);
+            addTask(newDate,taskDesc,true);
+        }
+
+
+        function renderOne(date,task)
+        {
+            /*
+                Create list element for task to reside within
+            */
+            var colour = task.complete ? "list-group-item-success" : "list-group-item-danger";
+            var newElement = document.createElement("li");
+            newElement.id = task.id;
+            $(newElement)
+            .addClass("list-group-item "+colour)
+            .append(Object.keys(taskset)[task.descid]);
+
+
+            //Add delete button to task
+            createDeleteButton(task,date,newElement);
+
+            //Add reschedule button
+            createRescheduleBtn(task,date,newElement);
+
+
+            //Add tick button
+            createTickButton(task,date,newElement);
+
+
+            taskList.append(newElement);
+        }
+
+
+        function renderAll(date)
+        {
+            taskList.empty();
+            if(date in eventData)
+            {
+                let tasks = Object.keys(eventData[date]["tasks"]);
+
+                for(let i=0;i<tasks.length;i++)
+                {
+                    let task = eventData[date]["tasks"][tasks[i]];
+                    renderOne(date,task);
+                }
+            }
+            updatePercentLbl(date);
+        }
+
+
+        function createRescheduleBtn(task,date,parent)
+        {
+            var dropdown = document.createElement("div");
+            $(dropdown).addClass("dropdown float-right");
+
+            //Button to activate calendar dropdown
+            var rescheduleButton = document.createElement("button");
+            $(rescheduleButton)
+            .addClass("btn btn-primary float-right dropdown-toggle")
+            .append("<img src=\"calendar.svg\">")
+            .css({"margin-left":25})
+            .attr("type","button").attr("data-toggle","dropdown");
+            $(dropdown).append(rescheduleButton);
+
+            //Drop down box
+            var dropdownlist = document.createElement("div");
+            $(dropdownlist).addClass("dropdown-menu").attr("aria-labelledby","dropdownMenuButton");
+
+                //Create card for rescheduler
+                var card = document.createElement("div");
+                $(card).addClass("card text-center");
+
+                //Card header for calendar
+                var cardHeader = document.createElement("div");
+                $(cardHeader)
+                .addClass("card-header")
+                .html("Reschedule calendar event");
+                $(card).append(cardHeader);
+
+                //Card body include date selector and a confirmation button
+                var cardBody = document.createElement("div");
+                $(cardBody).addClass("card-body");
+                var dateSelector = document.createElement("input");
+                $(dateSelector).attr("type","date");
+                cardBody.append(dateSelector);
+
+                var confirmDateBtn = document.createElement("button");
+                $(confirmDateBtn)
+                .addClass("btn btn-primary")
+                .html("Confirm change")
+                .css({"margin-top":15})
+                .click(function(){
+                    rescheduleTask(date,$(dateSelector).val(),task,Object.keys(taskset)[task.descid]);
+                    updateStorage();
+                    updatePercentLbl(date);
+                    $(parent).remove();
+                });
+                cardBody.append(confirmDateBtn);
+                card.append(cardBody);
+
+            dropdownlist.append(card);
+
+            dropdown.append(dropdownlist);
+
+            parent.append(dropdown);
+        }
+
+
+        function createDeleteButton(task,date,parent)
+        {
+            var deleteButton = document.createElement("button");
+            $(deleteButton)
+            .addClass("btn btn-secondary float-right")
+            .append("<img src=\"trash.svg\">")
+            .css({"margin-left":25,"background-color":"#ff0000"})
+            .click(function(){
+                $("#"+task.id).fadeOut(1000,function(){$(this).remove();});
+                deleteTask(date,task,false);
+                updateStorage();
+                updatePercentLbl(date);
+            });
+            parent.append(deleteButton);
+        }
+
+
+        function createTickButton(task,date,parent)
+        {
+            var checkButton = document.createElement("button");
+            $(checkButton)
+            .addClass("btn btn-secondary float-right")
+            .append("<img src=\"check.svg\">")
+            .click(function(){
+                if(task.complete)
+                {
+                    $("#"+task.id).removeClass("list-group-item-success").addClass("list-group-item-danger");
+                    task.complete = false;
+                    eventData[date]["completed"]--;
+                }
+                else
+                {
+                    $("#"+task.id).removeClass("list-group-item-danger").addClass("list-group-item-success");
+                    task.complete = true;
+                    eventData[date]["completed"]++;
+                }
+                updatePercentLbl(date);
+                updateStorage();
+            });
+            parent.append(checkButton);
+        }
+
+
+        function updatePercentLbl(date)
+        {
+            var percent = 0;
+
+            if(date in eventData)
+            {
+                let completedCount = eventData[date]["completed"];
+                let numberOfTasks = eventData[date]["count"];
+                percent = numberOfTasks == 0 ? 0 : Math.round((completedCount / numberOfTasks) * 100);
+            }
+
+            percentCompleteLbl.html(percent + "% complete");
+            progressbar.attr("style","width: "+percent+"%;");
+            progressbar.attr("aria-valuenow",percent);
+            return 0;
+        }
+
+
+        function setDefaultDatePicker()
+        {
+            let d = new Date();
+            let year = d.getFullYear();
+            let day = d.getDate().toString();
+            let month = (d.getMonth() + 1).toString();
+
+            month = month.length == 1 ? "0" + month : month;
+            day = day.length == 1 ? "0" + day : day;
+
+            dateSelector.attr("value",year + "-" + month + "-" + day);
+        }
+
+
+        function renderQuickAddTags()
+        {
+            var taskArray = Object.entries(taskset);
+            taskArray = taskArray.sort(function(a,b){
+                return b[1] - a[1];
+            });
+
+            quickAddBox.empty();
+            if(taskArray.length > 0)
+            {
+                for(let i=0;i<taskArray.length;i++)
+                {
+                    let task = taskArray[i];
+                    let taskBtn = document.createElement("button");
+
+                    $(taskBtn)
+                    .addClass("btn btn-primary")
+                    .attr("id","quickadd_"+task[0])
+                    .click(function(){
+                        addTask(dateSelector.val(),task[0]);
+                        renderAll(dateSelector.val());
+                    })
+                    .html(task[0])
+                    .css({"margin":10});
+
+                    quickAddBox.append(taskBtn);
+                }
+            }
+        }
+
+
+        $(document).ready(function(){
+
+
+            taskSubmit.click(function(){
+
+                let dateValue = dateSelector.val();
+                let taskDesc = taskDescription.val();
+                let errormsg = null;
+
+                if(dateValue !== "" && taskDesc !== "")
+                {
+                    addTask(dateValue,taskDesc,false);
+                    renderAll(dateValue);
+                    errormsg = null;
+                }
+                else
+                {
+                    //Log error
+                    errormsg = "Please provide a date and description";
+                }
+
+
+                if(errormsg !== null)
+                {
+                    formAlertBox.addClass("alert-danger");
+                }
+                else {
+                    formAlertBox.removeClass("alert-danger");
+                }
+
+                formAlertTxt.html(errormsg || "Task added");
+                formAlertBox.show();
+                renderQuickAddTags();
+            });
+
+
+            dateSelector.change(function(){
+                renderAll(dateSelector.val());
+            });
+
+
+            formAlertCloseBtn.click(function(){
+                formAlertBox.fadeOut(1500,function(){$(this).hide();});
+            });
+
+
+            formAlertBox.hide();
+            setDefaultDatePicker();
+            renderAll(dateSelector.val());
+
+            renderQuickAddTags();
+        });
+    </script>
+</body>
+</html>
