@@ -1,0 +1,87 @@
+/* Layout */
+.header-wrapper
+{
+    width: 100%;
+    height: auto;
+    float: left;
+    background-image: linear-gradient(hsl(230,50%,50%,1),hsl(230,50%,20%,1));
+    padding: 15px;
+}
+.content-wrapper
+{
+    width: 100%;
+    float: left;
+}
+.content
+{
+    width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px;
+}
+
+@media only screen and (max-width: 1024px)
+{
+    .content
+    {
+        width: 100%;
+    }
+}
+
+/* Banner */
+.banner-wrapper
+{
+    width: 100%;
+    float: left;
+    height: 400px;
+    background-image: url("../images/banner.png");
+    background-size: cover;
+}
+
+.banner-wrapper .banner
+{
+    width: 1024px;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media only screen and (max-width: 1024px)
+{
+    .banner-wrapper .banner
+    {
+        width: 90%;
+    }
+}
+
+.banner-wrapper .banner .infobox
+{
+    width: CALC(100%);
+    float: left;
+    padding: 15px;
+    background-color: #fff;
+    text-align: center;
+    font-size: 17pt;
+    border-radius: 5px;
+}
+
+.banner-wrapper .banner .title
+{
+    margin-top: 150px;
+}
+
+.banner-wrapper .banner .infobox.small
+{
+    font-size: 12pt;
+}
+
+/* Footer */
+.footer-wrapper
+{
+    width: 100%;
+    float: left;
+    background-image: linear-gradient(hsl(230,50%,50%,1),hsl(230,50%,20%,1));
+    padding: 60px;
+    text-align: center;
+    color: #fff;
+}

@@ -1,91 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>MyStructure</title>
+    <title>MyStructure | Detailed TODO lists to structure your days</title>
 
+    <meta charset="UTF-8"/>
+    <meta name="description" content="MyStructure allows you to create detailed TODO lists, and keep track of task completion."/>
+    <meta name="keywords" content="TODO, Organisation, Organization, Productivity"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link href="./styles/main.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 </head>
 <body>
     <div id="app">
-        <div class="container-fluid border-bottom bg-dark text-light">
-            <h1 class="text-center">MyStructure</h1>
+        <div class="header-wrapper">
+            <h1 class="font-weight-normal text-center text-white">MyStructure</h1>
         </div>
         <br/>
-        <div class="container-md">
-            <div class="alert alert-info">
-                <h2>Welcome to MyStructure : An app created using JQuery and Bootstrap</h2>
-                <p>This app aims to do the following:</p>
-                <ul>
-                    <li>
-                        Allow users to create daily todo lists
-                    </li>
-                    <li>
-                        Allow automated replication of recurring tasks
-                    </li>
-                    <li>
-                        Allow users to monitor progress
-                    </li>
-                    <li>
-                        Allow users to set deadlines for tasks
-                    </li>
-                </ul>
-                <i style="color:#ff0000">Disclaimer: This app currently uses local storage. This means that todo-lists are stored as cookies within your browser.
-                    Deleting these cookies will delete your todo-list.</i>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-muted">Update, create or view calander event</h3>
+        <div class="banner-wrapper">
+            <div class="banner">
+                <div class="infobox title">
+                    <h2 class="font-weight-normal">Welcome to MyStructure!</h2>
                 </div>
-                <div class="card-body">
-                        <div class="alert alert-success alert-dismissible fade show" id="formAlert" role="alert">
-                            <p></p>
-                            <button type="button" id="formAlertClose" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">Select date</span>
+                <div class="infobox small mt-3" id="headline">
+                    <noscript>
+                        A never-ending diary to plan your days, without the paper...
+                    </noscript>
+                </div>
+            </div>
+        </div>
+        <div class="content-wrapper">
+            <div class="content">
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">Data storage notice</h4>
+                    MyStructure does not currently synchronize with a server, so TODO lists are stored in your browser's
+                    local storage. Please be mindful of this, since if you clear the storage (perhaps when also deleting cookies), or your browser automatically
+                    clears this storage, your lists will be deleted.
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        My TODO list
+                    </div>
+                    <div class="card-body">
+                            <div class="alert alert-success alert-dismissible fade show" id="formAlert" role="alert">
+                                <p></p>
+                                <button type="button" id="formAlertClose" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                            <input type="date" class="form-control" id="dateSelector" aria-describedby="selectDate">
-                        </div>
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon1">Task description</span>
+                            <div class="form-group input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">Today's date</span>
+                                </div>
+                                <input type="date" class="form-control" id="currentDate" readonly>
                             </div>
-                            <input type="text" class="form-control" id="taskDesc" aria-describedby="taskName">
-                            <button  class="input-group-append btn btn-primary" id="taskAdd" aria-describedby="addTask">
-                                Add
-                            </button>
-                        </div>
-                        <br/>
-                        <div class="form-group input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Quick add</span>
+                            <div class="form-group input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">Select date</span>
+                                </div>
+                                <input type="date" class="form-control" id="dateSelector" aria-describedby="selectDate">
                             </div>
-                           <div class="container-fluid bg-light form-control" id="quickAddBox" style="height:auto;">
+                            <div class="form-group input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1">Task description</span>
+                                </div>
+                                <input type="text" class="form-control" id="taskDesc" aria-describedby="taskName">
+                                <button  class="input-group-append btn btn-primary" id="taskAdd" aria-describedby="addTask">
+                                    Add
+                                </button>
                             </div>
-                        </div>
-                        <br/>
-                        <div class="text-center">
-                            <h3 id="completionPercentage"></h3>
-                            <div class="progress">
-                                <div class="progress-bar" id="progressbar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            <br/>
+                            <div class="form-group input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Quick add</span>
+                                </div>
+                               <div class="container-fluid bg-light form-control" id="quickAddBox" style="height:auto;">
+                                </div>
                             </div>
-                        </div>
-                        <br/>
-                        <ul class="list-group" id="taskList">
+                            <br/>
+                            <div class="text-center">
+                                <h3 id="completionPercentage"></h3>
+                                <div class="progress">
+                                    <div class="progress-bar" id="progressbar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <br/>
+                            <ul class="list-group" id="taskList">
 
-                        </ul>
+                            </ul>
+                    </div>
                 </div>
             </div>
         </div>
         <br/>
         <br/>
-        <h5 class="text-center">Copyright &copy; Ryan Noonan 2020</h5>
+        <div class="footer-wrapper">
+            <span>Copyright © Ryan Noonan 2020-2023</span>
+        </div>
     </div>
     <br/>
     <br/>
@@ -105,6 +120,7 @@
 
 
         //UI components
+        var currentDate = $("#currentDate");
         var dateSelector = $("#dateSelector");
         var taskDescription = $("#taskDesc");
         var taskSubmit = $("#taskAdd");
@@ -189,20 +205,22 @@
             newElement.id = task.id;
             $(newElement)
             .addClass("list-group-item "+colour)
-            .append(Object.keys(taskset)[task.descid]);
+            .append("<div>"+Object.keys(taskset)[task.descid]+"</div>");
 
-
-            //Add delete button to task
-            createDeleteButton(task,date,newElement);
-
-            //Add reschedule button
-            createRescheduleBtn(task,date,newElement);
-
+            // Create actions box
+            var actions = document.createElement("div");
+            actions.style.marginTop = "20px";
 
             //Add tick button
-            createTickButton(task,date,newElement);
+            createTickButton(task,date,actions);
 
+            //Add reschedule button
+            createRescheduleBtn(task,date,actions);
 
+            //Add delete button to task
+            createDeleteButton(task,date,actions);
+
+            newElement.append(actions);
             taskList.append(newElement);
         }
 
@@ -227,14 +245,13 @@
         function createRescheduleBtn(task,date,parent)
         {
             var dropdown = document.createElement("div");
-            $(dropdown).addClass("dropdown float-right");
+            $(dropdown).addClass("dropdown float-left");
 
             //Button to activate calendar dropdown
             var rescheduleButton = document.createElement("button");
             $(rescheduleButton)
-            .addClass("btn btn-primary float-right dropdown-toggle")
-            .append("<img src=\"calendar.svg\">")
-            .css({"margin-left":25})
+            .addClass("btn btn-sm btn-primary float-left dropdown-toggle mr-2")
+            .append("<img src=\"./icons/calendar.svg\">")
             .attr("type","button").attr("data-toggle","dropdown");
             $(dropdown).append(rescheduleButton);
 
@@ -286,9 +303,9 @@
         {
             var deleteButton = document.createElement("button");
             $(deleteButton)
-            .addClass("btn btn-secondary float-right")
-            .append("<img src=\"trash.svg\">")
-            .css({"margin-left":25,"background-color":"#ff0000"})
+            .addClass("btn btn-sm btn-secondary float-left")
+            .append("<img src=\"./icons/trash.svg\">")
+            .css({"background-color":"#ff0000"})
             .click(function(){
                 $("#"+task.id).fadeOut(1000,function(){$(this).remove();});
                 deleteTask(date,task,false);
@@ -303,8 +320,8 @@
         {
             var checkButton = document.createElement("button");
             $(checkButton)
-            .addClass("btn btn-secondary float-right")
-            .append("<img src=\"check.svg\">")
+            .addClass("btn btn-sm btn-secondary float-left mr-2")
+            .append("<img src=\"./icons/check.svg\">")
             .click(function(){
                 if(task.complete)
                 {
@@ -343,7 +360,7 @@
         }
 
 
-        function setDefaultDatePicker()
+        function setDefaultDatePicker(element)
         {
             let d = new Date();
             let year = d.getFullYear();
@@ -353,7 +370,7 @@
             month = month.length == 1 ? "0" + month : month;
             day = day.length == 1 ? "0" + day : day;
 
-            dateSelector.attr("value",year + "-" + month + "-" + day);
+            element.attr("value",year + "-" + month + "-" + day);
         }
 
 
@@ -373,7 +390,7 @@
                     let taskBtn = document.createElement("button");
 
                     $(taskBtn)
-                    .addClass("btn btn-primary")
+                    .addClass("btn btn-sm btn-primary")
                     .attr("id","quickadd_"+task[0])
                     .click(function(){
                         addTask(dateSelector.val(),task[0]);
@@ -387,9 +404,27 @@
             }
         }
 
+        function typeHeadline(text,delay)
+        {
+            let headline = $("#headline");
+            let headlinePointer = -1;
+
+            let interval = setInterval(function(){
+                if (headlinePointer === text.length + 1)
+                {
+                    clearInterval(interval);
+                    return;
+                }
+
+                headline.text(text.substr(0,headlinePointer));
+                headlinePointer++;
+            },delay);
+        }
+
 
         $(document).ready(function(){
 
+            typeHeadline("A never-ending diary, without the paper...",50);
 
             taskSubmit.click(function(){
 
@@ -435,7 +470,8 @@
 
 
             formAlertBox.hide();
-            setDefaultDatePicker();
+            setDefaultDatePicker(dateSelector);
+            setDefaultDatePicker(currentDate);
             renderAll(dateSelector.val());
 
             renderQuickAddTags();
